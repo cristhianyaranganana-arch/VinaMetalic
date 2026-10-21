@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-linux:
     name: Linux-x64
     runs-on: ubuntu-latest
     steps:
@@ -39,8 +39,20 @@ jobs:
       - name: Install Boost
         run: sudo apt-get update && sudo apt-get install -y libboost-all-dev
 
+      # Audit findings #13/#14: run the byte-identical regression suite in CI
+      # against an upstream AutoDock Vina 1.2.7 reference binary.
+      - name: Download AutoDock Vina 1.2.7 reference binary
+        run: |
+          wget -q https://github.com/ccsb-scripps/AutoDock-Vina/releases/download/v1.2.7/vina_1.2.7_linux_x86_64 -O vina127
+          chmod +x vina127
+          ./vina127 --version
+
       - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBoost_USE_STATIC_LIBS=ON
+        run: >
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          -DBoost_USE_STATIC_LIBS=ON
+          -DVINA_REGRESSION_TEST=ON
+          -DVINA_127_BIN=${{ github.workspace }}/vina127
 
       - name: Build
         run: cmake --build build --parallel
@@ -58,9 +70,29 @@ jobs:
           path: dist/*
           if-no-files-found: error
 
+  build-macos:
+    name: macOS-arm64
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Boost
+        run: brew install boost
+
+      # Homebrew ships shared-only Boost; the portability default
+      # (USE_STATIC_BOOST=ON) is disabled for this platform build.
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DUSE_STATIC_BOOST=OFF
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
   release:
     name: Publish release
-    needs: build
+    needs: build-linux
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
