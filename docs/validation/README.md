@@ -10,6 +10,7 @@ seeds and box sizes are recorded inside each log.
 | `1s63_cnfix.log` | PDB 1s63, Zn²⁺ | CN target 1 (3 receptor donors); top-1 re-docking pose in the examples matches the crystal pose. |
 | `regression_no_metal.log` | 1iep, no metal | `--local_only` output **byte-identical** to AutoDock Vina 1.2.7. |
 | `regression_na_receptor.log` | 1iep + one Na⁺ (unparametrized metal) | `--local_only` output **byte-identical** to AutoDock Vina 1.2.7. On the pre-fix code this test failed (-9.108 vs -9.325 kcal/mol, different pose) — see `docs/AUDIT_FIXES.md` #1. |
+| `vinametalic_v1.0.0_comparative_validation.pdf` | Four-system benchmark (1iep; 1iep + Na⁺; 1s63 Zn²⁺; 4FIY Mn²⁺) | Formal comparative validation report vs AutoDock Vina 1.2.7: byte-identical reproducibility on P1/P2, coordination scoring characterized on P3/P4, binary SHA-256 provenance and reproduction commands. Also attached to Release v1.0.0. |
 
 ## Notes
 
@@ -25,4 +26,3 @@ seeds and box sizes are recorded inside each log.
 - The regression tests require an upstream AutoDock Vina 1.2.7 binary;
   CI downloads `vina_1.2.7_linux_x86_64` from the Scripps release page and
   runs both via CTest (`-DVINA_REGRESSION_TEST=ON`).
-  | `vinametalic_v1.0.0_comparative_validation.pdf` | Four-system benchmark (1iep; 1iep + Na⁺; 1s63 Zn²⁺; 4FIY Mn²⁺) | Formal comparative validation report vs AutoDock Vina 1.2.7: byte-identical reproducibility on P1/P2, coordination scoring characterized on P3/P4, binary SHA-256 provenance and reproduction commands. Also attached to Release v1.0.0. |
