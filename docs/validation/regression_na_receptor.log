@@ -1,0 +1,10 @@
+# VinaMetalic v1.0.0 validation log
+# Command: tests/test_regression_na_receptor.sh <vinametalic> <vina-1.2.7-upstream>
+# 1iep receptor + one Na+ 1.7 A from a ligand donor oxygen (unparametrized metal),
+# --local_only, seed 42; upstream Vina 1.2.7 built from source.
+# NOTE: on the pre-fix code this test FAILS (-9.108 vs -9.325 kcal/mol, different
+# pose) because cache::populate() zeroed the Na+-donor interaction; with the fix
+# the output is byte-identical to upstream Vina 1.2.7.
+VinaMetalic: Estimated Free Energy of Binding   : -9.325 (kcal/mol) [=(1)+(2)+(3)-(4)]
+Reference  : Estimated Free Energy of Binding   : -9.325 (kcal/mol) [=(1)+(2)+(3)-(4)]
+RESULT: BYTE_IDENTICAL
