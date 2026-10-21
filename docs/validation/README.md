@@ -25,3 +25,4 @@ seeds and box sizes are recorded inside each log.
 - The regression tests require an upstream AutoDock Vina 1.2.7 binary;
   CI downloads `vina_1.2.7_linux_x86_64` from the Scripps release page and
   runs both via CTest (`-DVINA_REGRESSION_TEST=ON`).
+  | `vinametalic_v1.0.0_comparative_validation.pdf` | Four-system benchmark (1iep; 1iep + Na⁺; 1s63 Zn²⁺; 4FIY Mn²⁺) | Formal comparative validation report vs AutoDock Vina 1.2.7: byte-identical reproducibility on P1/P2, coordination scoring characterized on P3/P4, binary SHA-256 provenance and reproduction commands. Also attached to Release v1.0.0. |
