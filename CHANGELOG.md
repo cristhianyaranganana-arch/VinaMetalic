@@ -5,116 +5,68 @@ All notable changes to VinaMetalic are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.0.0] - 2026-10-21
 
-No changes yet.
-
-## [1.0.1] - 2026-10-20
-
-Maintenance release after the 1.0.0 audit: no scoring-function changes. With
-no parametrized metal ions in the receptor, output remains byte-identical to
-AutoDock Vina 1.2.7 (`tests/test_regression_no_metal.sh`).
+First release of **VinaMetalic**, fork of AutoDock Vina 1.2.7 with native
+metal coordination scoring. The codebase descends from VinaMetal v1.0.0
+(commit `96370bc`); every software finding of the independent audit of that
+codebase (16+1 findings, all verified against the source) is fixed here. With
+no parametrized metal in the receptor — including receptors that contain only
+unparametrized metals such as Na⁺ — scoring and output remain byte-identical
+to AutoDock Vina 1.2.7.
 
 ### Added
 
-- `--metal_breakdown` CLI flag: prints the metal energy breakdown
-  (metal vdW / CN penalty / geometry bonus / donor-metal contacts) after a
-  `--score_only` or `--local_only` run. The underlying
-  `metal_scoring::eval_breakdown()` existed since 1.0.0 but was only
-  reachable from the C++ API.
+- `scripts/fix_metal_types.py`: retypes metal atoms (Zn, Mn, Mg, Ca, Fe, Cu,
+  Ni) in a receptor PDBQT from their element symbol, making Cu²⁺/Ni²⁺
+  receptors reachable despite Meeko not emitting those AD types (#5).
+- Byte-identical regression test **with an unparametrized Na⁺ in the
+  receptor** (`tests/test_regression_na_receptor.sh` + test data): guards the
+  grid path against over-excluding metals; it fails on the pre-fix code
+  (-9.108 vs -9.325 kcal/mol vs upstream) and passes now (#1).
+- Runtime robustness guard for occupation detection: `build_cache` re-counts
+  every N/O/S receptor atom within the coordination cutoff and warns when the
+  typed-donor count is smaller, exposing under-detected occupancy (#10).
+- Explicit stderr warning in `index_for_ad_type` when a declared oxidation
+  state has no calibrated entry and the code falls back to another one (#7).
+- `docs/CALIBRATION_PLAN.md`: full protocol (dataset, grid search,
+  leave-one-out, acceptance criteria) to calibrate the metal weights (#9).
+- `docs/AUDIT_FIXES.md`: finding-by-finding mapping of the audit and its
+  resolution.
+- CTest registration of both byte-identical regression tests behind
+  `-DVINA_REGRESSION_TEST=ON -DVINA_127_BIN=<path>` (#13).
+- macOS ARM64 build/test CI job in addition to Linux x64 (#14).
+- `--metal_breakdown` CLI flag (exposes `metal_scoring::eval_breakdown`,
+  previously C++-API-only) and `metal_breakdown()` accessor.
 
 ### Changed
 
-- Banner now reads `VinaMetalic vX.Y.Z (fork of AutoDock Vina 1.2.7)` instead
-  of `AutoDock Vina v1.0.0` (which looked like a downgrade of Vina 1.2.7).
-- Bug-report URL in the error message points to the VinaMetalic issue tracker.
-- The startup citation box leads with the VinaMetalic citation and the
-  AutoDock4Zn paper (DOI 10.1021/ci500209e), keeping the AutoDock Vina
-  references below.
+- Banner reads `VinaMetalic v1.0.0 (fork of AutoDock Vina 1.2.7)`; the
+  bug-report URL and the startup citation box point to VinaMetalic (#4).
+- Source builds link Boost **statically by default**
+  (`-DUSE_STATIC_BOOST=OFF` to disable) for portable binaries (#12).
+- `--metal_cn_strict` is now implemented: it penalizes the CN deviation
+  against the full ideal coordination number instead of the
+  receptor-occupancy-reduced target; the CN report line is tagged when
+  active (#2).
+- `--metal_oxidation` charges are validated strictly: integers in [-4, 8]
+  via `std::stoi`; anything else aborts with an error instead of silently
+  becoming the default +2 state (#6).
 
 ### Fixed
 
-- Removed the dangling code comment that cited `MAPA_DE_PORTERIA.md`, a file
-  never committed to the repository; the AD4 donor set is now referenced to
-  `data/ad4_reference/` and the AutoDock4Zn publication.
-- Moved `data/AD4Zn.dat` to `data/ad4_reference/AD4Zn.dat`: the directional
-  AD4Zn model is not ported yet, so the file is reference material, not an
-  active force field (documented in `docs/USAGE.md` and `LIMITATIONS.md` #7).
-- Documented atom-level occupancy counting as an explicit design decision:
-  a bidentate carboxylate counts as two donors (`LIMITATIONS.md` #4, README).
-
-## [1.0.0] - 2026-10-19
-
-First public release. VinaMetalic is a fork of AutoDock Vina 1.2.7 that adds
-native transition-metal coordination scoring to the Vina scoring function.
-
-### Added
-
-- Metal-specific 12-6 van der Waals pair potential between each parametrized
-  ion and ligand donor atoms (N/O/S), using AD4 parameters and Harding
-  coordination distances.
-- Smooth, differentiable coordination-number (CN) penalty driven by a sigmoid
-  occupancy function, with analytic gradients for the BFGS minimizer.
-- Bounded coordination-geometry bonus for tetrahedral, octahedral and
-  square-planar sites, aggregated over donor pairs.
-- Automatic receptor occupancy detection: before scoring, each metal counts the
-  rigid receptor donors inside its coordination cutoff and reduces the ligand CN
-  target to `max(0, CN_ideal - receptor-bound donors)`. The adjustment is
-  reported at startup (`VinaMetalic: <ion> CN target = ideal ...`).
-- Built-in parameters for Zn²⁺, Mn²⁺, Mg²⁺, Ca²⁺, Fe, Cu²⁺ and Ni²⁺, with
-  per-ion coordination cutoffs and ideal geometries.
-- `--metals auto|off` switch to enable or disable metal coordination scoring.
-- `--metal_params` JSON override for per-site ion parameters, including a
-  site-specific `ideal_cn` for metals with unusual coordination.
-- `--metal_oxidation` to declare oxidation states of multi-valent metals
-  (for example `Fe=3`).
-- `--weight_metal_vdw`, `--weight_metal_cn` and `--weight_metal_geom` to scale
-  the three metal energy terms independently.
-- `--metal_cn_strict` to penalize any deviation from the ideal coordination
-  number, including incomplete shells.
-- Stouten desolvation fields (`vol`, `solpar`) ported and exposed in the metal
-  parameter set. The metal-specific desolvation term is not yet applied.
-- CMake build (`vina`, `vina_split`, `vinametalic_core` static library) with
-  CTest integration.
-- C++ gradient test comparing analytic metal forces against finite differences.
-- End-to-end CN detection test on the two bundled examples.
-- No-metal regression script comparing `--local_only` output against unmodified
-  AutoDock Vina 1.2.7.
-- Example systems: GlfT2 (PDB 4FIY chain A, Mn²⁺) and PDB 1s63 (Zn²⁺).
-- Helper wrappers for Meeko ligand and receptor preparation.
-- Documentation: installation, usage, limitations and validation logs.
-
-### Validation
-
-- **GlfT2 / PDB 4FIY chain A (Mn²⁺):** 4 receptor donors detected, ligand CN
-  target 2; best pose RMSD 0.95 Å (mode 3 of 9).
-- **PDB 1s63 (Zn²⁺):** 3 receptor donors detected, ligand CN target 1; top-1
-  pose RMSD 0.33 Å.
-- **No-metal regression:** byte-identical `--local_only` output against
-  AutoDock Vina 1.2.7 on the 1iep test system.
-- RMSD values are heavy-atom, symmetry-aware, computed with RDKit
-  `GetBestRMS` against the crystal ligand.
-
-### Known Limitations
-
-See [docs/LIMITATIONS.md](docs/LIMITATIONS.md). In short: Fe oxidation states
-are manual, Cu²⁺ and Ni²⁺ parameters are placeholders, the receptor is rigid,
-occupancy counting uses Vina donor typing, and the metal weights are not yet
-benchmark-calibrated.
-
-### Release assets
-
-- Linux x86-64 binary archive and examples archive are built and published by
-  GitHub Actions on each `v*` tag.
-- Prebuilt Windows binary is **deferred** for this release; Windows users can
-  build from source.
-
-### Licensing
-
-- Source code: Apache License 2.0. The original Scripps Research Institute
-  copyright notices are retained.
-- `data/ad4_reference/`: GNU General Public License v2.0 (see
-  `data/ad4_reference/COPYING`).
-
-[Unreleased]: https://github.com/cristhianyaranganana-arch/VinaMetalic/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/cristhianyaranganana-arch/VinaMetalic/releases/tag/v1.0.0
+- Grid path over-exclusion: `cache::populate()` excluded every atom with
+  `el == EL_TYPE_Met` from donor-type maps, silently zeroing the standard
+  Vina interaction of unparametrized metals (Na, K, Co, Hg, Cd) in map-based
+  scoring; it now excludes only parametrized ions (`is_metal_ion`), matching
+  the direct path and upstream Vina 1.2.7 (#1).
+- Removed the dead `dE_dcos` variable in the geometry gradient block (#3).
+- Removed the dangling reference to `MAPA_DE_PORTERIA.md`; the AD4 donor set
+  is referenced to `data/ad4_reference/` and the AutoDock4Zn publication.
+- `data/AD4Zn.dat` moved to `data/ad4_reference/AD4Zn.dat` and documented as
+  reference-only (the directional TZ model is not ported) (#8).
+- Corrected the AutoDock4Zn citation everywhere: *J. Chem. Inf. Model.*
+  **2014**, *54* (8), **2371–2379** (was 1931–1941) (#17).
+- Documented the atom-level occupancy convention as an explicit design
+  decision (bidentate carboxylate = two donors) and the CTest coverage of the
+  regression suite (#10, #13).

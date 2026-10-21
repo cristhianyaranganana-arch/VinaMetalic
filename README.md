@@ -1,133 +1,149 @@
 # VinaMetalic
 
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![CI](https://github.com/cristhianyaranganana-arch/VinaMetalic/actions/workflows/build.yml/badge.svg)](https://github.com/cristhianyaranganana-arch/VinaMetalic/actions/workflows/build.yml)
-[![Release](https://img.shields.io/github/v/release/cristhianyaranganana-arch/VinaMetalic)](https://github.com/cristhianyaranganana-arch/VinaMetalic/releases)
-![Platform: Linux x64](https://img.shields.io/badge/platform-Linux%20x64-blue.svg)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23499212.svg)](https://doi.org/10.5281/zenodo.23499212)
+**VinaMetalic** is a fork of [AutoDock Vina 1.2.7](https://github.com/ccsb-scripps/AutoDock-Vina)
+with **native metal coordination scoring** for metalloenzymes. It guides
+ligand poses toward coordination of the catalytic metal ion, detects the
+receptor-bound coordination occupancy automatically, and stays
+**byte-identical to upstream Vina 1.2.7** when no parametrized metal is
+present.
 
-**AutoDock Vina fork with native, physics-based transition metal coordination
-and automatic binding site occupancy detection.**
+- Author: **Christian Yaranga Nana** — Universidad Norbert Wiener
+- GitHub: <https://github.com/cristhianyaranganana-arch/VinaMetalic>
+- License: Apache-2.0 (the AutoDock 4 reference parameter files in
+  `data/ad4_reference/` are GPL-2, see `COPYING` there)
 
-VinaMetalic 1.0.1 is a fork of AutoDock Vina 1.2.7 developed for reproducible
-docking into metalloprotein active sites.
+![CI](https://github.com/cristhianyaranganana-arch/VinaMetalic/actions/workflows/build.yml/badge.svg)
+![Platform](https://img.shields.io/badge/platform-Linux%20x64%20%7C%20macOS%20ARM64-blue)
+![License](https://img.shields.io/badge/license-Apache--2.0-green)
 
-> **Platform support:** the prebuilt release assets are **Linux x86-64 only**.
-> Windows users can still build from source; a prebuilt Windows binary is
-> planned for a future release.
+## Why
 
-## The Problem
+A large fraction of drug targets are metalloenzymes — zinc proteases and
+HDACs, carbonic anhydrases, Mn²⁺-dependent glycosyltransferases such as the
+tuberculosis target GlfT2, HIV integrase (Mg²⁺), influenza endonuclease
+(Mn²⁺) — and the pharmacophore of their approved inhibitors is bidentate
+coordination of the catalytic ion. Stock Vina types metals as a generic
+hydrophobic-ish sphere: nothing rewards approaching the metal at a real
+coordination distance, and poses often never touch the ion. VinaMetalic
+replaces that behavior with a physically motivated metal model while keeping
+everything else identical to Vina 1.2.7.
 
-Generic empirical scoring functions treat metal ions as ordinary heavy atoms.
-As a result, they cannot reward the correct metal–ligand coordination number,
-penalize over-coordination, or distinguish tetrahedral from octahedral sites.
-Docking campaigns against metalloenzymes therefore depend on manual
-intervention and are difficult to reproduce.
+## What it adds (and what changed after the audit)
 
-## The Solution
+Three conditional scoring terms (evaluated only for parametrized ions, with
+analytic gradients consumed by Vina's unmodified BFGS search):
 
-VinaMetalic integrates AutoDock 4 metal physics directly into Vina's native
-scoring function, with analytic gradients consumed by the unmodified ILM+BFGS
-engine:
+1. **Metal–donor 12-6 pair potential** (AutoDock4 combination rules) with the
+   minimum at the Harding mean metal–donor distance per donor element.
+2. **Coordination-number penalty** on the smooth count of ligand donors in the
+   coordination shell, against a target reduced automatically by the receptor
+   occupancy (`CN target = ideal − receptor-bound`, printed at startup).
+3. **Bounded geometry bonus** for donor–metal–donor angles matching the ideal
+   geometry (tetrahedral / octahedral / square-planar).
 
-- Metal-specific 12-6 van der Waals parameters and Harding coordination
-  distances, taken from the AD4 parameter tables.
-- A smooth, differentiable coordination-number (CN) penalty.
-- A bounded coordination-geometry bonus (tetrahedral, octahedral,
-  square-planar).
-- **Automatic Receptor Occupancy Detection**: before scoring, the rigid
-  receptor donors already bound to each metal are counted within the ion's
-  coordination cutoff, and the ligand CN target becomes
-  `max(0, CN_ideal − receptor-bound donors)`. No manual per-site override is
-  required.
+VinaMetalic ships parameters for **Zn²⁺, Mn²⁺, Mg²⁺, Ca²⁺, Fe, Cu²⁺, Ni²⁺**.
 
-Metal–donor pairs are excluded from the standard Vina Gaussian term to avoid
-double counting. The Stouten desolvation parameters of AD4 are ported but
-currently inactive; see [Limitations](#limitations).
+After an independent line-by-line audit of the predecessor codebase (16+1
+findings), this release fixes all of them: the grid-path over-exclusion bug
+for unparametrized metals (with a new Na⁺ regression test), the previously
+dead `--metal_cn_strict` flag (now implemented), strict `--metal_oxidation`
+validation, an explicit warning for oxidation-state fallback, a
+`fix_metal_types.py` helper that makes Cu²⁺/Ni²⁺ receptors reachable, a
+runtime warning for under-detected occupancy, static-Boost-by-default builds,
+the regression suite registered in CTest, Linux+macOS CI, and the corrected
+AutoDock4Zn citation. See **[docs/AUDIT_FIXES.md](docs/AUDIT_FIXES.md)** for
+the complete finding-by-finding mapping.
 
-## Validation
+## Install
 
-| System | Ion | Receptor donors detected | Ligand CN target | Best-pose RMSD |
-|---|---|---|---|---|
-| GlfT2, PDB 4FIY chain A | Mn²⁺ | 4 | 2 | **0.95 Å** (mode 3 of 9) |
-| PDB 1s63 | Zn²⁺ | 3 | 1 | **0.33 Å** (top-1) |
+### From source
 
-RMSD is heavy-atom, symmetry-aware (RDKit `GetBestRMS`) against the crystal
-ligand. The automatic adjustment was confirmed in the run logs, for example:
-
-    VinaMetalic: Mn2+ CN target = ideal 6 - receptor-bound 4 = 2
-
-For receptors without parametrized metal ions, the scoring and gradient path is
-byte-identical to unmodified AutoDock Vina 1.2.7 (`--local_only` comparison);
-see `docs/validation/`.
-
-## Quick Start
-
-Requirements: CMake ≥ 3.12, a C++11 compiler, and Boost ≥ 1.65 with the
-`system`, `thread`, `serialization`, `filesystem` and `program_options`
-libraries.
-
+    git clone https://github.com/cristhianyaranganana-arch/VinaMetalic
+    cd VinaMetalic
     cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-    cmake --build build -j
-    ctest --test-dir build --output-on-failure
+    cmake --build build --parallel
 
-Run the GlfT2 example (the Mn²⁺ is detected automatically):
+Boost >= 1.65 (system, thread, serialization, filesystem, program_options) and
+CMake >= 3.12 are required. Builds are **statically linked against Boost by
+default** for portability; pass `-DUSE_STATIC_BOOST=OFF` on platforms that
+only provide shared Boost (e.g. Homebrew/macOS). See
+[docs/INSTALL.md](docs/INSTALL.md).
 
-    cd examples/glft2
-    ../../build/vina --config config.txt --metals auto --out glft2_out.pdbqt
+### Run an example
 
-The log prints the occupancy-adjusted target:
+    cd examples/glft2            # GlfT2 (PDB 4FIY) with a catalytic Mn2+
+    ../build/vina --config config.txt --out result.pdbqt
 
-    VinaMetalic: parametrized metal ions in receptor: Mn(x1) - coordination scoring is ACTIVE
+The log prints the automatic occupancy adjustment, e.g.:
+
     VinaMetalic: Mn2+ CN target = ideal 6 - receptor-bound 4 = 2
 
-Use `--metals off` to disable metal coordination scoring and recover plain Vina
-behavior. See [docs/USAGE.md](docs/USAGE.md) for all options,
-[docs/INSTALL.md](docs/INSTALL.md) for platform-specific builds, and
-[docs/LIMITATIONS.md](docs/LIMITATIONS.md) before production use.
+## Documentation
 
-## Limitations
+- [docs/USAGE.md](docs/USAGE.md) — metal options, occupancy detection,
+  Cu²⁺/Ni²⁺ preparation, reproducibility checklist
+- [docs/INSTALL.md](docs/INSTALL.md) — build details and platforms
+- [docs/LIMITATIONS.md](docs/LIMITATIONS.md) — known limitations, each with
+  its shipped mitigation and planned fix
+- [docs/CALIBRATION_PLAN.md](docs/CALIBRATION_PLAN.md) — protocol to calibrate
+  the metal weights before virtual screening
+- [docs/AUDIT_FIXES.md](docs/AUDIT_FIXES.md) — the 16+1 audit findings and
+  their resolution
+- [docs/validation/](docs/validation/) — recorded validation logs
+- [CHANGELOG.md](CHANGELOG.md) — release history
 
-- Fe oxidation states must be declared manually (`--metal_oxidation Fe=3`).
-- Cu²⁺ and Ni²⁺ parameters are placeholders pending calibration.
-- The receptor is rigid; coordinating side chains do not reorganize.
-- Receptor occupancy uses a hard integer cutoff and Vina's donor typing; flex
-  residues are not counted as occupancy. It counts donor **atoms**, not
-  chelating groups (a bidentate carboxylate counts as 2) — an explicit design
-  decision, see [docs/LIMITATIONS.md](docs/LIMITATIONS.md) #4.
-- The metal scoring weights are not yet benchmark-calibrated.
+## Tests
 
-See [docs/LIMITATIONS.md](docs/LIMITATIONS.md) for the complete list.
+    ctest --test-dir build --output-on-failure                      # gradients + CN detection
+    tests/test_regression_no_metal.sh   build/vina vina_1.2.7       # byte-identical, no metals
+    tests/test_regression_na_receptor.sh build/vina vina_1.2.7      # byte-identical with Na+
+
+The two regression tests compare VinaMetalic output **byte-for-byte** with an
+upstream AutoDock Vina 1.2.7 binary for receptors that contain no
+parametrized metal (the Na⁺ test guards the grid path against silently
+zeroing unparametrized-metal interactions). CI runs them automatically.
+
+## When (not) to use it
+
+**Use it** to enforce mechanistic plausibility on metalloenzyme docking:
+discard poses that do not coordinate the catalytic metal when coordination is
+required for activity, and to explore metal-directed poses that stock Vina
+never samples.
+
+**Do not** interpret the affinities as calibrated binding energies: the metal
+weights are placeholders until the calibration benchmark
+([docs/CALIBRATION_PLAN.md](docs/CALIBRATION_PLAN.md)) is completed, and the
+metal reward is bounded by design, so a coordinating pose can score 0.8–1.5
+kcal/mol less favorable than a non-coordinating pose under stock Vina. Known
+promiscuous chelators (flavonoids, catechols) coordinate most divalent ions
+and must be treated as PAINS-style hypothesis generators, not hits.
 
 ## Citation
 
-    @software{vinametalic2026,
-      title        = {VinaMetalic},
-      author       = {Christian Yaranga Nana},
-      year         = {2026},
-      version      = {1.0.1},
-      doi          = {10.5281/zenodo.23499212},
-      url          = {https://github.com/cristhianyaranganana-arch/VinaMetalic},
-      note         = {Fork of AutoDock Vina 1.2.7 with native metal coordination}
-    }
+If you use VinaMetalic, please cite (a CITATION.cff is provided; the Zenodo
+DOI will be added on the first release deposit):
 
-Please also cite the foundations of this work:
+> C. Yaranga Nana (Universidad Norbert Wiener).
+> *VinaMetalic: metal coordination scoring integrated into AutoDock Vina
+> v1.0.0* (2026).
+> <https://github.com/cristhianyaranganana-arch/VinaMetalic>
 
-- Trott, O.; Olson, A. J. *J. Comput. Chem.* **2010**, 31, 455–461.
-- Eberhardt, J.; Santos-Martins, D.; Tillack, A. F.; Forli, S.
-  *J. Chem. Inf. Model.* **2021**, 61, 3891–3898.
+and the foundations this work builds upon:
+
 - Santos-Martins, D.; Forli, S.; Ribeiro, A. J. M.; Ramos, M. J.; Olson, A. J.
-  *J. Chem. Inf. Model.* **2014**, 54, 1931–1941.
-- Harding, M. M. *Acta Crystallogr. D* **2001**, 57, 401–411.
+  *J. Chem. Inf. Model.* **2014**, *54* (8), 2371–2379 (AutoDock4Zn).
+- Eberhardt, J.; Santos-Martins, D.; Tillack, A. F.; Forli, S.
+  *J. Chem. Inf. Model.* **2021**, *61*, 3891–3898 (AutoDock Vina 1.2.0).
+- Trott, O.; Olson, A. J. *J. Comput. Chem.* **2010**, *31*, 455–461 (Vina).
+- Harding, M. M. *Acta Crystallogr. D* **2001**, *57*, 401–411
+  (metal–ligand geometry).
 
 ## Credits & License
 
-VinaMetalic is built on AutoDock Vina and AutoDock 4, developed at The Scripps
-Research Institute. The original copyright notices are retained in the source
-files. The example inputs are derived from PDB entries **4FIY** and **1s63**
-(RCSB Protein Data Bank).
-
-The source code is distributed under the Apache License, Version 2.0; see
-[LICENSE](LICENSE). AutoDock 4 parameter files in `data/ad4_reference/` are
-distributed under the GNU General Public License v2.0; see
-`data/ad4_reference/COPYING`.
+VinaMetalic is built on AutoDock Vina and AutoDock 4 (The Scripps Research
+Institute); the original copyright notices are retained in the source files.
+It descends from **VinaMetal v1.0.0** by the same author; every software
+finding of the independent audit of that codebase is fixed in this release
+([docs/AUDIT_FIXES.md](docs/AUDIT_FIXES.md)). The example inputs are derived
+from PDB entries **4FIY** and **1s63**. Licensed under Apache-2.0; the
+AutoDock 4 reference parameter files are GPL-2 (`data/ad4_reference/COPYING`).

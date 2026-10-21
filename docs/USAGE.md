@@ -49,12 +49,11 @@ Mn²⁺, 3.3 Å for Ca²⁺; see `src/lib/metal_parameters.cpp`).
 |---|---|---|
 | `--metals auto\|off` | `auto` | Enable or disable metal coordination scoring. |
 | `--metal_params FILE` | — | JSON file overriding built-in ion parameters (`ideal_cn`, cutoffs, radii, geometry, weights). |
-| `--metal_oxidation Fe=3` | — | Declare oxidation states for multi-valent metals. |
+| `--metal_oxidation Fe=3` | — | Declare oxidation states for multi-valent metals. Charges must be integers in [-4, 8]; invalid values abort with an error instead of silently defaulting to +2. |
 | `--weight_metal_vdw W` | 1.0 | Weight of the metal 12-6 pair term. |
 | `--weight_metal_cn W` | 1.0 | Weight of the CN penalty. |
 | `--weight_metal_geom W` | 1.0 | Weight of the geometry bonus. |
-| `--metal_cn_strict` | off | Penalize any CN deviation even with an incomplete shell. |
-| `--metal_breakdown` | off | After a `--score_only` or `--local_only` run, print the metal energy breakdown: metal vdW, CN penalty, geometry bonus and the number of donor-metal contacts. |
+| `--metal_cn_strict` | off | Penalize the CN deviation against the full ideal coordination number instead of the receptor-occupancy-reduced target (useful when the ligand should restore a complete shell). The CN report line gains a `[strict: penalizing against ideal CN]` tag when active. |
 | `--metal_breakdown` | off | After a `--score_only` or `--local_only` run, print the metal energy breakdown: metal vdW, CN penalty, geometry bonus and the number of donor-metal contacts. |
 
 The weights are placeholders pending benchmark calibration; see
@@ -74,6 +73,40 @@ The weights are placeholders pending benchmark calibration; see
 
 Run with `--metal_params override.json`. An overridden `ideal_cn` is still
 reduced by the automatic receptor occupancy.
+
+## Preparing receptors with Cu2+ / Ni2+
+
+Meeko's `mk_prepare_receptor.py` does not emit the Cu/Ni AutoDock types, so a
+receptor prepared with the standard pipeline leaves those ions with a generic
+type and the metal scoring never activates for them. After preparing the
+receptor, retype the metal atoms from their element symbol:
+
+    python3 scripts/fix_metal_types.py receptor.pdbqt -o receptor_fixed.pdbqt
+
+The script rewrites only the atom-type column of metal atoms (Zn, Mn, Mg, Ca,
+Fe, Cu, Ni), never coordinates or charges, and reports metals without
+VinaMetalic parameters (Na, K, Co, Cd, Hg) so they stay generic on purpose.
+
+If the occupancy warning appears (`occupancy is N typed donor(s), but M N/O/S
+receptor atom(s) lie within the ... cutoff`), some coordinating atoms are not
+typed as donors: fix the receptor typing instead of trusting the CN target.
+
+## Regression tests vs AutoDock Vina 1.2.7
+
+Receptors with **no parametrized metal** (and receptors whose only metals are
+unparametrized, e.g. Na+) must produce byte-identical output to upstream
+Vina 1.2.7. The CTest suite covers both cases when a reference binary is
+provided:
+
+    cmake -S . -B build -DVINA_REGRESSION_TEST=ON -DVINA_127_BIN=/path/to/vina_1.2.7
+    cmake --build build && ctest --test-dir build
+
+Equivalently, run the scripts directly:
+
+    tests/test_regression_no_metal.sh  ./vina /path/to/vina_1.2.7
+    tests/test_regression_na_receptor.sh ./vina /path/to/vina_1.2.7
+
+Recorded results live in `docs/validation/`.
 
 ## Reference data files
 
@@ -101,13 +134,17 @@ the CN target line, so they can be used to check the detected occupancy:
 
 ## Interpreting results
 
-- Coordination energy is integrated into the total affinity. Library users can
-  obtain per-term values (vdW, CN, geometry) from
-  `metal_scoring::eval_breakdown`; the CLI does not print a breakdown.
+- Coordination energy is integrated into the total affinity. After a
+  `--score_only` or `--local_only` run, `--metal_breakdown` prints the per-term
+  values (metal vdW, CN penalty, geometry bonus, donor-metal contacts);
+  library users can obtain the same values from
+  `metal_scoring::eval_breakdown`.
 - The log line `CN target = ideal X - receptor-bound Y = Z` documents the
   occupancy adjustment for each metal.
-- With a receptor containing no parametrized metal, VinaMetalic is equivalent to
-  AutoDock Vina 1.2.7; see `docs/validation/regression_no_metal.log`.
+- With a receptor containing no parametrized metal (or only unparametrized
+  ones such as Na+), VinaMetalic is equivalent to AutoDock Vina 1.2.7; see
+  `docs/validation/regression_no_metal.log` and
+  `docs/validation/regression_na_receptor.log`.
 
 ## Reproducibility checklist
 

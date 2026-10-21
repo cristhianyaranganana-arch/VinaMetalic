@@ -108,37 +108,37 @@ your problem report:\n\
 \n\
 Thank you!\n";
 
-        const std::string cite_message = "\
-#################################################################\n\
-# If you used VinaMetalic in your work, please cite:              #\n\
+        const std::string cite_message = "#################################################################\n\
+# If you used VinaMetalic in your work, please cite:            #\n\
 #                                                               #\n\
-#   C. Yaranga Nana, VinaMetalic: metal coordination scoring      #\n\
-#   integrated into AutoDock Vina (2026).                       #\n\
-#   https://github.com/cristhianyaranganana-arch/VinaMetalic      #\n\
+#   C. Yaranga Nana (Universidad Norbert Wiener),               #\n\
+#   VinaMetalic: metal coordination scoring integrated          #\n\
+#   into AutoDock Vina v1.0.0 (2026).                           #\n\
+#   https://github.com/cristhianyaranganana-arch/VinaMetalic    #\n\
 #                                                               #\n\
 # and the AutoDock4Zn force field it ports:                     #\n\
 #                                                               #\n\
 #   D. Santos-Martins, S. Forli, M. J. Ramos, and A. J. Olson,  #\n\
 #   AutoDock4Zn: An Improved AutoDock Force Field for           #\n\
 #   Small-Molecule Docking to Zinc Metalloproteins,             #\n\
-#   J. Chem. Inf. Model. 54(8), 1931-1941 (2014).               #\n\
+#   J. Chem. Inf. Model. 54(8), 2371-2379 (2014).               #\n\
 #   DOI 10.1021/ci500209e                                       #\n\
 #                                                               #\n\
 # and the AutoDock Vina publications it builds upon:            #\n\
 #                                                               #\n\
-# J. Eberhardt, D. Santos-Martins, A. F. Tillack, and S. Forli  #\n\
-# AutoDock Vina 1.2.0: New Docking Methods, Expanded Force      #\n\
-# Field, and Python Bindings, J. Chem. Inf. Model. (2021)       #\n\
-# DOI 10.1021/acs.jcim.1c00203                                  #\n\
+#   J. Eberhardt, D. Santos-Martins, A. F. Tillack, S. Forli,   #\n\
+#   AutoDock Vina 1.2.0: New Docking Methods, Expanded Force    #\n\
+#   Field, and Python Bindings, J. Chem. Inf. Model. (2021)     #\n\
+#   DOI 10.1021/acs.jcim.1c00203                                #\n\
 #                                                               #\n\
-# O. Trott, A. J. Olson,                                        #\n\
-# AutoDock Vina: improving the speed and accuracy of docking    #\n\
-# with a new scoring function, efficient optimization and       #\n\
-# multithreading, J. Comp. Chem. (2010)                         #\n\
-# DOI 10.1002/jcc.21334                                         #\n\
+#   O. Trott, A. J. Olson,                                      #\n\
+#   AutoDock Vina: improving the speed and accuracy of docking  #\n\
+#   with a new scoring function, efficient optimization and     #\n\
+#   multithreading, J. Comp. Chem. (2010)                       #\n\
+#   DOI 10.1002/jcc.21334                                       #\n\
 #                                                               #\n\
-# Please see https://github.com/ccsb-scripps/AutoDock-Vina for  #\n\
-# more information.                                             #\n\
+#   See https://github.com/ccsb-scripps/AutoDock-Vina for       #\n\
+#   more information.                                           #\n\
 #################################################################\n";
 
 
