@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to VinaMetal are documented in this file.
+All notable changes to VinaMetalic are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -25,10 +25,10 @@ AutoDock Vina 1.2.7 (`tests/test_regression_no_metal.sh`).
 
 ### Changed
 
-- Banner now reads `VinaMetal vX.Y.Z (fork of AutoDock Vina 1.2.7)` instead
+- Banner now reads `VinaMetalic vX.Y.Z (fork of AutoDock Vina 1.2.7)` instead
   of `AutoDock Vina v1.0.0` (which looked like a downgrade of Vina 1.2.7).
-- Bug-report URL in the error message points to the VinaMetal issue tracker.
-- The startup citation box leads with the VinaMetal citation and the
+- Bug-report URL in the error message points to the VinaMetalic issue tracker.
+- The startup citation box leads with the VinaMetalic citation and the
   AutoDock4Zn paper (DOI 10.1021/ci500209e), keeping the AutoDock Vina
   references below.
 
@@ -45,7 +45,7 @@ AutoDock Vina 1.2.7 (`tests/test_regression_no_metal.sh`).
 
 ## [1.0.0] - 2026-10-19
 
-First public release. VinaMetal is a fork of AutoDock Vina 1.2.7 that adds
+First public release. VinaMetalic is a fork of AutoDock Vina 1.2.7 that adds
 native transition-metal coordination scoring to the Vina scoring function.
 
 ### Added
@@ -60,7 +60,7 @@ native transition-metal coordination scoring to the Vina scoring function.
 - Automatic receptor occupancy detection: before scoring, each metal counts the
   rigid receptor donors inside its coordination cutoff and reduces the ligand CN
   target to `max(0, CN_ideal - receptor-bound donors)`. The adjustment is
-  reported at startup (`VinaMetal: <ion> CN target = ideal ...`).
+  reported at startup (`VinaMetalic: <ion> CN target = ideal ...`).
 - Built-in parameters for Zn²⁺, Mn²⁺, Mg²⁺, Ca²⁺, Fe, Cu²⁺ and Ni²⁺, with
   per-ion coordination cutoffs and ideal geometries.
 - `--metals auto|off` switch to enable or disable metal coordination scoring.
@@ -74,7 +74,7 @@ native transition-metal coordination scoring to the Vina scoring function.
   number, including incomplete shells.
 - Stouten desolvation fields (`vol`, `solpar`) ported and exposed in the metal
   parameter set. The metal-specific desolvation term is not yet applied.
-- CMake build (`vina`, `vina_split`, `vinametal_core` static library) with
+- CMake build (`vina`, `vina_split`, `vinametalic_core` static library) with
   CTest integration.
 - C++ gradient test comparing analytic metal forces against finite differences.
 - End-to-end CN detection test on the two bundled examples.
@@ -116,5 +116,5 @@ benchmark-calibrated.
 - `data/ad4_reference/`: GNU General Public License v2.0 (see
   `data/ad4_reference/COPYING`).
 
-[Unreleased]: https://github.com/cristhianyaranganana-arch/VinaMetal/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/cristhianyaranganana-arch/VinaMetal/releases/tag/v1.0.0
+[Unreleased]: https://github.com/cristhianyaranganana-arch/VinaMetalic/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/cristhianyaranganana-arch/VinaMetalic/releases/tag/v1.0.0

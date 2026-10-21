@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Wrapper around Meeko's mk_prepare_receptor.py.
 
-VinaMetal consumes PDBQT receptors. Meeko can convert a PDB structure to PDBQT
+VinaMetalic consumes PDBQT receptors. Meeko can convert a PDB structure to PDBQT
 while keeping selected heteroatoms (metal ions, cofactors, waters). This wrapper
 only forwards arguments, so the upstream tool's options and behavior are
 unchanged.

@@ -1,8 +1,8 @@
 /*
 
-  VinaMetal - metal_scoring module
+  VinaMetalic - metal_scoring module
 
-  Copyright (c) 2024, VinaMetal developers
+  Copyright (c) 2024, VinaMetalic developers
   Based on AutoDock Vina (Copyright (c) 2006-2010, The Scripps Research Institute)
   Licensed under the Apache License, Version 2.0.
 
@@ -303,7 +303,7 @@ void metal_scoring::report_cn_targets(std::ostream& out) const {
     if (!m_enabled || !m_cache.prepared) return;
     VINA_FOR_IN(k, m_cache.metal_atoms) {
         const metal_ion& ion = m_params->ion(m_cache.metal_ions[k]);
-        out << "VinaMetal: " << ion.name << " CN target = ideal " << ion.ideal_cn
+        out << "VinaMetalic: " << ion.name << " CN target = ideal " << ion.ideal_cn
             << " - receptor-bound " << m_cache.occupied_cn[k]
             << " = " << m_cache.target_cn[k] << "\n";
     }

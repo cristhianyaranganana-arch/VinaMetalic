@@ -1,8 +1,8 @@
 /*
 
-  VinaMetal - metal_scoring module
+  VinaMetalic - metal_scoring module
 
-  Copyright (c) 2024, VinaMetal developers
+  Copyright (c) 2024, VinaMetalic developers
   Based on AutoDock Vina (Copyright (c) 2006-2010, The Scripps Research Institute)
   Licensed under the Apache License, Version 2.0.
 

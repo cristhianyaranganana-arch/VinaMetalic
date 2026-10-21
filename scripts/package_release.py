@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Build the VinaMetal release assets from a compiled build directory.
+"""Build the VinaMetalic release assets from a compiled build directory.
 
 Creates, inside the output directory:
 
-  VinaMetal-<version>-<platform>.tar.gz
-  VinaMetal-<version>-<platform>.zip
-  VinaMetal-<version>-Examples.zip
+  VinaMetalic-<version>-<platform>.tar.gz
+  VinaMetalic-<version>-<platform>.zip
+  VinaMetalic-<version>-Examples.zip
 
 The platform package contains the executables, examples, parameter data,
 documentation and license files. Source code is distributed through the
@@ -139,10 +139,10 @@ def main():
     output_dir = os.path.abspath(args.output_dir)
     os.makedirs(output_dir, exist_ok=True)
 
-    top_name = f"VinaMetal-v{args.version}-{args.platform}"
+    top_name = f"VinaMetalic-v{args.version}-{args.platform}"
     windows = "windows" in args.platform.lower()
 
-    with tempfile.TemporaryDirectory(prefix="vinametal-pkg-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="vinametalic-pkg-") as tmp:
         stage_root = os.path.join(tmp, top_name)
         os.makedirs(stage_root)
         stage_platform(stage_root, build_dir, args.version, windows)
@@ -152,8 +152,8 @@ def main():
         make_tar_gz(tmp, top_name, tar_path)
         make_zip(tmp, top_name, zip_path)
 
-    examples_name = f"VinaMetal-v{args.version}-Examples"
-    with tempfile.TemporaryDirectory(prefix="vinametal-ex-") as tmp:
+    examples_name = f"VinaMetalic-v{args.version}-Examples"
+    with tempfile.TemporaryDirectory(prefix="vinametalic-ex-") as tmp:
         stage = os.path.join(tmp, examples_name)
         shutil.copytree(os.path.join(REPO_ROOT, "examples"), os.path.join(stage, "examples"))
         make_zip(tmp, examples_name, os.path.join(output_dir, examples_name + ".zip"))

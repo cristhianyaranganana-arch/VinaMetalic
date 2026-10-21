@@ -1,6 +1,6 @@
 # Usage
 
-VinaMetal accepts the AutoDock Vina command line. This page documents the metal
+VinaMetalic accepts the AutoDock Vina command line. This page documents the metal
 coordination options and the automatic CN adjustment.
 
 ## Basic run
@@ -25,7 +25,7 @@ activated only when the receptor contains a metal ion with built-in parameters.
 
 ## Automatic receptor occupancy detection
 
-Before scoring, VinaMetal inspects the rigid receptor (`grid_atoms`) and counts
+Before scoring, VinaMetalic inspects the rigid receptor (`grid_atoms`) and counts
 the N/O/S atoms typed as coordination donors that lie within the ion's
 coordination cutoff. The ligand CN target is then
 
@@ -34,7 +34,7 @@ coordination cutoff. The ligand CN target is then
 The adjustment is computed once per receptor and is therefore thread-safe.
 With `-v` (the default), the result is printed before docking:
 
-    VinaMetal: Mn2+ CN target = ideal 6 - receptor-bound 4 = 2
+    VinaMetalic: Mn2+ CN target = ideal 6 - receptor-bound 4 = 2
 
 The penalty compares this target with the smooth count of movable donors in the
 coordination shell. A receptor with four protein donors therefore expects two
@@ -82,7 +82,7 @@ reduced by the automatic receptor occupancy.
   `AD4_parameters.dat`, `AD4.1_bound.dat`, `AD4_PARM99.dat`.
 - `data/ad4_reference/AD4Zn.dat` — the AutoDock4Zn parameter set
   (Santos-Martins et al., *J. Chem. Inf. Model.* 2014,
-  DOI 10.1021/ci500209e). It is kept **as reference only**: VinaMetal ports
+  DOI 10.1021/ci500209e). It is kept **as reference only**: VinaMetalic ports
   the Zn²⁺ 12-6 vdW terms and the CN/geometry terms, but not yet the full
   directional AD4Zn model (`nbp_r_eps`, TZ pseudoatoms, Zn–H interactions).
   See [LIMITATIONS.md](LIMITATIONS.md) #7.
@@ -106,7 +106,7 @@ the CN target line, so they can be used to check the detected occupancy:
   `metal_scoring::eval_breakdown`; the CLI does not print a breakdown.
 - The log line `CN target = ideal X - receptor-bound Y = Z` documents the
   occupancy adjustment for each metal.
-- With a receptor containing no parametrized metal, VinaMetal is equivalent to
+- With a receptor containing no parametrized metal, VinaMetalic is equivalent to
   AutoDock Vina 1.2.7; see `docs/validation/regression_no_metal.log`.
 
 ## Reproducibility checklist

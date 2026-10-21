@@ -10,7 +10,7 @@
 set -euo pipefail
 
 if [ "$#" -ne 2 ]; then
-    echo "usage: $0 <vinametal-binary> <reference-vina-1.2.7-binary>" >&2
+    echo "usage: $0 <vinametalic-binary> <reference-vina-1.2.7-binary>" >&2
     exit 2
 fi
 
@@ -29,16 +29,16 @@ run() {
          --local_only --seed 42 --out "$2"
 }
 
-run "$VINA_BIN" "$TMP/vinametal.pdbqt" > "$TMP/vinametal.log" 2>&1
+run "$VINA_BIN" "$TMP/vinametalic.pdbqt" > "$TMP/vinametalic.log" 2>&1
 run "$REFERENCE_BIN" "$TMP/reference.pdbqt" > "$TMP/reference.log" 2>&1
 
-echo "VinaMetal : $(grep -m1 'Estimated Free Energy' "$TMP/vinametal.log")"
+echo "VinaMetalic : $(grep -m1 'Estimated Free Energy' "$TMP/vinametalic.log")"
 echo "Reference : $(grep -m1 'Estimated Free Energy' "$TMP/reference.log")"
 
-if cmp -s "$TMP/vinametal.pdbqt" "$TMP/reference.pdbqt"; then
+if cmp -s "$TMP/vinametalic.pdbqt" "$TMP/reference.pdbqt"; then
     echo "RESULT: BYTE_IDENTICAL"
 else
     echo "RESULT: DIFFERENT (the scoring/gradient path changed without metals)" >&2
-    diff -u "$TMP/reference.pdbqt" "$TMP/vinametal.pdbqt" | head -40 >&2 || true
+    diff -u "$TMP/reference.pdbqt" "$TMP/vinametalic.pdbqt" | head -40 >&2 || true
     exit 1
 fi

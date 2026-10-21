@@ -1,6 +1,6 @@
 /*
 
-  VinaMetal - gradient verification test (finite differences vs analytic)
+  VinaMetalic - gradient verification test (finite differences vs analytic)
 
   Verifies that the analytic gradients of the metal coordination terms,
   exactly as BFGS consumes them through model::eval_deriv, match central
@@ -77,7 +77,7 @@ struct eval_context {
 
     // pure_metal: zero out the standard Vina weights so the total energy is
     // ONLY the metal coordination terms (all C-infinity) - this isolates the
-    // gradients introduced by VinaMetal from the pre-existing finite-difference
+    // gradients introduced by VinaMetalic from the pre-existing finite-difference
     // artifacts of the standard terms (repulsion kinks, SO(3) chord effects).
     eval_context(model& m, const grid_dims& gd, metal_scoring* ms, bool pure_metal) : v(1000, 1000, 1000) {
         fl w_scale = pure_metal ? 0.0 : 1.0;
@@ -205,7 +205,7 @@ int main(int argc, char** argv) {
     run_gradient_check(RECEPTOR_ZN, &ms, "Zn + full scoring", ok, false, 5e-3);
 
     // 3) control WITHOUT metals in receptor (full scoring): same FD artifact
-    //    level must appear, proving the artifacts are not introduced by VinaMetal
+    //    level must appear, proving the artifacts are not introduced by VinaMetalic
     metal_scoring ms2(&params, 1.0, 1.0, 1.0, false);
     run_gradient_check(RECEPTOR_NOMETAL, &ms2, "no metal control", ok, false, 5e-3);
 

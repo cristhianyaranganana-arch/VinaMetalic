@@ -169,9 +169,9 @@ public:
 	      atom& get_atom(const atom_index& i)       { return (i.in_grid ? grid_atoms[i.i] : atoms[i.i]); }
 
 private:
-	friend class Vina; // VinaMetal
+	friend class Vina; // VinaMetalic
 	friend struct cache;
-	friend struct metal_scoring; // VinaMetal
+	friend struct metal_scoring; // VinaMetalic
 	friend struct non_cache;
 	friend struct ad4cache;
 	friend struct szv_grid;

@@ -1,6 +1,6 @@
 # Installation
 
-VinaMetal is a C++11 project. The only external dependency is Boost (≥ 1.65)
+VinaMetalic is a C++11 project. The only external dependency is Boost (≥ 1.65)
 with the `system`, `thread`, `serialization`, `filesystem` and
 `program_options` libraries.
 
@@ -14,7 +14,7 @@ Tested on Ubuntu 22.04 with GCC 11.4 and Boost 1.74.
     ctest --test-dir build --output-on-failure
 
 The executables are `build/vina` and `build/vina_split`. The binary reports its
-version as `VinaMetal v1.0.1 (fork of AutoDock Vina 1.2.7)`.
+version as `VinaMetalic v1.0.1 (fork of AutoDock Vina 1.2.7)`.
 
 If Boost is installed in a non-standard location, pass
 `-DBOOST_ROOT=/path/to/boost` to CMake.
@@ -61,8 +61,8 @@ examples archive from a build directory:
     python3 scripts/package_release.py \
         --build-dir build --platform Linux-x64 --version 1.0
 
-It writes `dist/VinaMetal-v1.0-Linux-x64.tar.gz`,
-`dist/VinaMetal-v1.0-Linux-x64.zip` and `dist/VinaMetal-v1.0-Examples.zip`, and
+It writes `dist/VinaMetalic-v1.0-Linux-x64.tar.gz`,
+`dist/VinaMetalic-v1.0-Linux-x64.zip` and `dist/VinaMetalic-v1.0-Examples.zip`, and
 prints their SHA-256 hashes. The archives contain the executables, examples,
 documentation, parameter data and license files; source code is distributed
 through the repository.

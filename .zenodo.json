@@ -1,5 +1,5 @@
 {
-  "title": "VinaMetal",
+  "title": "VinaMetalic",
   "version": "v1.0.1",
   "upload_type": "software",
   "creators": [
@@ -9,7 +9,7 @@
       "orcid": "0009-0000-5539-0526"
     }
   ],
-  "description": "<p>VinaMetal is a fork of AutoDock Vina 1.2.7 that integrates AutoDock 4 metal coordination physics into the native scoring function: metal-specific 12-6 van der Waals terms, a differentiable coordination-number penalty and a bounded geometry bonus, all with analytic gradients. It detects coordination sites already occupied by the rigid receptor and adjusts the ligand coordination-number target automatically. Redocking of GlfT2 (Mn2+) and PDB 1s63 (Zn2+) reproduced the crystal binding modes with heavy-atom RMSDs of 0.95 A and 0.33 A.</p>",
+  "description": "<p>VinaMetalic is a fork of AutoDock Vina 1.2.7 that integrates AutoDock 4 metal coordination physics into the native scoring function: metal-specific 12-6 van der Waals terms, a differentiable coordination-number penalty and a bounded geometry bonus, all with analytic gradients. It detects coordination sites already occupied by the rigid receptor and adjusts the ligand coordination-number target automatically. Redocking of GlfT2 (Mn2+) and PDB 1s63 (Zn2+) reproduced the crystal binding modes with heavy-atom RMSDs of 0.95 A and 0.33 A.</p>",
   "license": "Apache-2.0",
   "keywords": [
     "molecular docking",
@@ -21,7 +21,7 @@
   "access_right": "open",
   "related_identifiers": [
     {
-      "identifier": "https://github.com/cristhianyaranganana-arch/VinaMetal",
+      "identifier": "https://github.com/cristhianyaranganana-arch/VinaMetalic",
       "relation": "isSupplementTo",
       "scheme": "url"
     }

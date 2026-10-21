@@ -79,7 +79,7 @@ public:
                 m_seed = generate_seed(seed);
                 m_no_refine = no_refine;
                 m_progress_callback = progress_callback;
-                // VinaMetal: metal coordination scoring defaults (conditional, active
+                // VinaMetalic: metal coordination scoring defaults (conditional, active
                 // only when parametrized metal ions are present in the receptor)
                 m_weight_metal_vdw = 1.0;   // PLACEHOLDER default, calibrated in benchmark phase
                 m_weight_metal_cn = 1.0;    // PLACEHOLDER default
@@ -140,7 +140,7 @@ public:
         void set_ad4_weights(double weight_ad4_vdw=0.1662, double weight_ad4_hb=0.1209,
                                                       double weight_ad4_elec=0.1406, double weight_ad4_dsolv=0.1322,
                                                       double weight_glue=50, double weight_ad4_rot=0.2983);
-        // ---- VinaMetal: metal coordination scoring API (O2/O3/O4) ----
+        // ---- VinaMetalic: metal coordination scoring API (O2/O3/O4) ----
         void set_metal_weights(double weight_metal_vdw=1.0, double weight_metal_cn=1.0,
                                double weight_metal_geom=1.0, bool metal_cn_strict=false);
         void set_metal_params(const std::string& path);          // --metal_params (JSON override)
@@ -193,7 +193,7 @@ private:
         int m_verbosity;
         bool m_no_refine;
         std::function<void(double)>* m_progress_callback;
-        // VinaMetal
+        // VinaMetalic
         metal_parameters m_metal_parameters;
         metal_scoring m_metal_scoring;
         double m_weight_metal_vdw;
@@ -207,8 +207,8 @@ private:
         output_container remove_redundant(const output_container& in, fl min_rmsd);
 
         void set_forcefield();
-        void refresh_metal_scoring();   // VinaMetal: rebuild + attach to grids
-        void check_receptor_metals();   // VinaMetal: detection warnings (oxidation states)
+        void refresh_metal_scoring();   // VinaMetalic: rebuild + attach to grids
+        void check_receptor_metals();   // VinaMetalic: detection warnings (oxidation states)
         std::vector<double> optimize(output_type& out, const int max_steps=0);
         int generate_seed(const int seed=0);
 };

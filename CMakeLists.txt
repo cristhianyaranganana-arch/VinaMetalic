@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(VinaMetal VERSION 1.0.1 LANGUAGES CXX)
+project(VinaMetalic VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -19,7 +19,7 @@ find_package(Boost 1.65 REQUIRED COMPONENTS
 )
 find_package(Threads REQUIRED)
 
-set(VINAMETAL_LIB_SOURCES
+set(VINAMETALIC_LIB_SOURCES
     src/lib/ad4cache.cpp
     src/lib/cache.cpp
     src/lib/conf_independent.cpp
@@ -41,16 +41,16 @@ set(VINAMETAL_LIB_SOURCES
     src/lib/vina.cpp
 )
 
-add_library(vinametal_core STATIC ${VINAMETAL_LIB_SOURCES})
-target_include_directories(vinametal_core PUBLIC src/lib ${Boost_INCLUDE_DIRS})
-target_link_libraries(vinametal_core PUBLIC ${Boost_LIBRARIES} Threads::Threads)
+add_library(vinametalic_core STATIC ${VINAMETALIC_LIB_SOURCES})
+target_include_directories(vinametalic_core PUBLIC src/lib ${Boost_INCLUDE_DIRS})
+target_link_libraries(vinametalic_core PUBLIC ${Boost_LIBRARIES} Threads::Threads)
 
 add_executable(vina src/main/main.cpp)
-target_link_libraries(vina PRIVATE vinametal_core)
+target_link_libraries(vina PRIVATE vinametalic_core)
 target_compile_definitions(vina PRIVATE VERSION="v1.0.1")
 
 add_executable(vina_split src/split/split.cpp)
-target_link_libraries(vina_split PRIVATE vinametal_core)
+target_link_libraries(vina_split PRIVATE vinametalic_core)
 target_compile_definitions(vina_split PRIVATE VERSION="v1.0.1")
 
 install(TARGETS vina vina_split RUNTIME DESTINATION bin)
@@ -58,7 +58,7 @@ install(TARGETS vina vina_split RUNTIME DESTINATION bin)
 include(CTest)
 if(BUILD_TESTING)
     add_executable(metal_gradient_test tests/metal_gradient_test.cpp)
-    target_link_libraries(metal_gradient_test PRIVATE vinametal_core)
+    target_link_libraries(metal_gradient_test PRIVATE vinametalic_core)
     add_test(NAME metal_gradient COMMAND metal_gradient_test)
 
     find_package(Python3 COMPONENTS Interpreter)

@@ -1,15 +1,15 @@
-# VinaMetal
+# VinaMetalic
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![CI](https://github.com/cristhianyaranganana-arch/VinaMetal/actions/workflows/build.yml/badge.svg)](https://github.com/cristhianyaranganana-arch/VinaMetal/actions/workflows/build.yml)
-[![Release](https://img.shields.io/github/v/release/cristhianyaranganana-arch/VinaMetal)](https://github.com/cristhianyaranganana-arch/VinaMetal/releases)
+[![CI](https://github.com/cristhianyaranganana-arch/VinaMetalic/actions/workflows/build.yml/badge.svg)](https://github.com/cristhianyaranganana-arch/VinaMetalic/actions/workflows/build.yml)
+[![Release](https://img.shields.io/github/v/release/cristhianyaranganana-arch/VinaMetalic)](https://github.com/cristhianyaranganana-arch/VinaMetalic/releases)
 ![Platform: Linux x64](https://img.shields.io/badge/platform-Linux%20x64-blue.svg)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23499212.svg)](https://doi.org/10.5281/zenodo.23499212)
 
 **AutoDock Vina fork with native, physics-based transition metal coordination
 and automatic binding site occupancy detection.**
 
-VinaMetal 1.0.1 is a fork of AutoDock Vina 1.2.7 developed for reproducible
+VinaMetalic 1.0.1 is a fork of AutoDock Vina 1.2.7 developed for reproducible
 docking into metalloprotein active sites.
 
 > **Platform support:** the prebuilt release assets are **Linux x86-64 only**.
@@ -26,7 +26,7 @@ intervention and are difficult to reproduce.
 
 ## The Solution
 
-VinaMetal integrates AutoDock 4 metal physics directly into Vina's native
+VinaMetalic integrates AutoDock 4 metal physics directly into Vina's native
 scoring function, with analytic gradients consumed by the unmodified ILM+BFGS
 engine:
 
@@ -55,7 +55,7 @@ currently inactive; see [Limitations](#limitations).
 RMSD is heavy-atom, symmetry-aware (RDKit `GetBestRMS`) against the crystal
 ligand. The automatic adjustment was confirmed in the run logs, for example:
 
-    VinaMetal: Mn2+ CN target = ideal 6 - receptor-bound 4 = 2
+    VinaMetalic: Mn2+ CN target = ideal 6 - receptor-bound 4 = 2
 
 For receptors without parametrized metal ions, the scoring and gradient path is
 byte-identical to unmodified AutoDock Vina 1.2.7 (`--local_only` comparison);
@@ -78,8 +78,8 @@ Run the GlfT2 example (the Mn²⁺ is detected automatically):
 
 The log prints the occupancy-adjusted target:
 
-    VinaMetal: parametrized metal ions in receptor: Mn(x1) - coordination scoring is ACTIVE
-    VinaMetal: Mn2+ CN target = ideal 6 - receptor-bound 4 = 2
+    VinaMetalic: parametrized metal ions in receptor: Mn(x1) - coordination scoring is ACTIVE
+    VinaMetalic: Mn2+ CN target = ideal 6 - receptor-bound 4 = 2
 
 Use `--metals off` to disable metal coordination scoring and recover plain Vina
 behavior. See [docs/USAGE.md](docs/USAGE.md) for all options,
@@ -101,13 +101,13 @@ See [docs/LIMITATIONS.md](docs/LIMITATIONS.md) for the complete list.
 
 ## Citation
 
-    @software{vinametal2026,
-      title        = {VinaMetal},
+    @software{vinametalic2026,
+      title        = {VinaMetalic},
       author       = {Christian Yaranga Nana},
       year         = {2026},
       version      = {1.0.1},
       doi          = {10.5281/zenodo.23499212},
-      url          = {https://github.com/cristhianyaranganana-arch/VinaMetal},
+      url          = {https://github.com/cristhianyaranganana-arch/VinaMetalic},
       note         = {Fork of AutoDock Vina 1.2.7 with native metal coordination}
     }
 
@@ -122,7 +122,7 @@ Please also cite the foundations of this work:
 
 ## Credits & License
 
-VinaMetal is built on AutoDock Vina and AutoDock 4, developed at The Scripps
+VinaMetalic is built on AutoDock Vina and AutoDock 4, developed at The Scripps
 Research Institute. The original copyright notices are retained in the source
 files. The example inputs are derived from PDB entries **4FIY** and **1s63**
 (RCSB Protein Data Bank).

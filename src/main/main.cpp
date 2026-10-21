@@ -67,7 +67,7 @@ void check_occurrence(boost::program_options::variables_map& vm, boost::program_
         }
 }
 
-// VinaMetal: print the metal coordination energy breakdown computed by
+// VinaMetalic: print the metal coordination energy breakdown computed by
 // metal_scoring::eval_breakdown() through Vina::metal_breakdown()
 // (formerly only accessible from the C++ API).
 void print_metal_breakdown(const Vina& v) {
@@ -76,7 +76,7 @@ void print_metal_breakdown(const Vina& v) {
         v.metal_breakdown(e_vdw, e_cn, e_geom, n_contacts);
         char buf[256];
         std::snprintf(buf, sizeof(buf),
-                "VinaMetal breakdown: metal vdW = %.3f | CN penalty = %.3f | "
+                "VinaMetalic breakdown: metal vdW = %.3f | CN penalty = %.3f | "
                 "geometry bonus = %.3f kcal/mol | donor-metal contacts = %d\n",
                 e_vdw, e_cn, e_geom, n_contacts);
         std::cout << buf;
@@ -85,12 +85,12 @@ void print_metal_breakdown(const Vina& v) {
 int main(int argc, char* argv[]) {
         using namespace boost::program_options;
         const std::string git_version = VERSION;
-        // VinaMetal branding: VERSION is the VinaMetal release (set by CMake as
+        // VinaMetalic branding: VERSION is the VinaMetalic release (set by CMake as
         // "vX.Y.Z"), not the upstream AutoDock Vina version this fork is based on.
-        const std::string version_string = "VinaMetal " + git_version + " (fork of AutoDock Vina 1.2.7)";
+        const std::string version_string = "VinaMetalic " + git_version + " (fork of AutoDock Vina 1.2.7)";
         const std::string error_message = "\n\n\
 Please report bugs through the Issue Tracker on GitHub \n\
-(https://github.com/cristhianyaranganana-arch/VinaMetal/issues), so\n\
+(https://github.com/cristhianyaranganana-arch/VinaMetalic/issues), so\n\
 that this problem can be resolved. The reproducibility of the\n\
 error may be vital, so please remember to include the following in\n\
 your problem report:\n\
@@ -110,11 +110,11 @@ Thank you!\n";
 
         const std::string cite_message = "\
 #################################################################\n\
-# If you used VinaMetal in your work, please cite:              #\n\
+# If you used VinaMetalic in your work, please cite:              #\n\
 #                                                               #\n\
-#   C. Yaranga Nana, VinaMetal: metal coordination scoring      #\n\
+#   C. Yaranga Nana, VinaMetalic: metal coordination scoring      #\n\
 #   integrated into AutoDock Vina (2026).                       #\n\
-#   https://github.com/cristhianyaranganana-arch/VinaMetal      #\n\
+#   https://github.com/cristhianyaranganana-arch/VinaMetalic      #\n\
 #                                                               #\n\
 # and the AutoDock4Zn force field it ports:                     #\n\
 #                                                               #\n\
@@ -193,7 +193,7 @@ Thank you!\n";
                 double weight_vinardo_hydrophobic = -0.035;
                 double weight_vinardo_hydrogen = -0.600;
 
-                // VinaMetal: metal coordination weights and options
+                // VinaMetalic: metal coordination weights and options
                 double weight_metal_vdw  = 1.0;  // PLACEHOLDER default, calibrated in benchmark phase
                 double weight_metal_cn   = 1.0;  // PLACEHOLDER default
                 double weight_metal_geom = 1.0;  // PLACEHOLDER default
@@ -276,15 +276,15 @@ Thank you!\n";
 
                         ("weight_glue", value<double>(&weight_glue)->default_value(weight_glue),                      "macrocycle glue weight")
 
-                        // VinaMetal: metal coordination scoring
-                        ("metals", value<std::string>(&metals_mode)->default_value(metals_mode), "metal coordination scoring: auto (default) or off (VinaMetal)")
-                        ("metal_params", value<std::string>(&metal_params_file), "JSON file overriding the built-in metal ion parameters (VinaMetal)")
-                        ("metal_oxidation", value<std::string>(&metal_oxidation), "oxidation states for multi-valent metals, e.g. 'Fe=3' or 'Fe=3,Cu=1' (VinaMetal)")
-                        ("weight_metal_vdw", value<double>(&weight_metal_vdw)->default_value(weight_metal_vdw), "metal vdW weight (VinaMetal)")
-                        ("weight_metal_cn", value<double>(&weight_metal_cn)->default_value(weight_metal_cn), "coordination-number penalty weight (VinaMetal)")
-                        ("weight_metal_geom", value<double>(&weight_metal_geom)->default_value(weight_metal_geom), "coordination geometry bonus weight (VinaMetal)")
-                        ("metal_cn_strict", bool_switch(&metal_cn_strict)->default_value(false), "treat any coordination number deviation as penalized even for incomplete shells (VinaMetal)")
-                        ("metal_breakdown", bool_switch(&show_metal_breakdown), "print the VinaMetal energy breakdown (metal vdW / CN penalty / geometry bonus / donor-metal contacts) after --score_only or --local_only scoring (VinaMetal)")
+                        // VinaMetalic: metal coordination scoring
+                        ("metals", value<std::string>(&metals_mode)->default_value(metals_mode), "metal coordination scoring: auto (default) or off (VinaMetalic)")
+                        ("metal_params", value<std::string>(&metal_params_file), "JSON file overriding the built-in metal ion parameters (VinaMetalic)")
+                        ("metal_oxidation", value<std::string>(&metal_oxidation), "oxidation states for multi-valent metals, e.g. 'Fe=3' or 'Fe=3,Cu=1' (VinaMetalic)")
+                        ("weight_metal_vdw", value<double>(&weight_metal_vdw)->default_value(weight_metal_vdw), "metal vdW weight (VinaMetalic)")
+                        ("weight_metal_cn", value<double>(&weight_metal_cn)->default_value(weight_metal_cn), "coordination-number penalty weight (VinaMetalic)")
+                        ("weight_metal_geom", value<double>(&weight_metal_geom)->default_value(weight_metal_geom), "coordination geometry bonus weight (VinaMetalic)")
+                        ("metal_cn_strict", bool_switch(&metal_cn_strict)->default_value(false), "treat any coordination number deviation as penalized even for incomplete shells (VinaMetalic)")
+                        ("metal_breakdown", bool_switch(&show_metal_breakdown), "print the VinaMetalic energy breakdown (metal vdW / CN penalty / geometry bonus / donor-metal contacts) after --score_only or --local_only scoring (VinaMetalic)")
                 ;
                 options_description misc("Misc (optional)");
                 misc.add_options()
@@ -446,14 +446,14 @@ Thank you!\n";
 
                 Vina v(sf_name, cpu, seed, verbosity, no_refine);
 
-                // VinaMetal: metal coordination scoring setup BEFORE receptor loading
+                // VinaMetalic: metal coordination scoring setup BEFORE receptor loading
                 // (set_receptor runs metal detection and needs parameters/oxidation states)
                 if (metals_mode != "auto" && metals_mode != "off") {
                         std::cerr << "ERROR: --metals expects 'auto' or 'off', got '" << metals_mode << "'\n";
                         exit(EXIT_FAILURE);
                 }
                 if (show_metal_breakdown && !(score_only || local_only)) {
-                        std::cerr << "VinaMetal: --metal_breakdown only applies to --score_only and --local_only runs; ignoring it.\n";
+                        std::cerr << "VinaMetalic: --metal_breakdown only applies to --score_only and --local_only runs; ignoring it.\n";
                 }
                 v.set_metals_enabled(metals_mode == "auto");
                 if (vm.count("metal_params"))
@@ -517,14 +517,14 @@ Thank you!\n";
                                         energies = v.score(unbound_energy);
                                 }
                                 v.show_score(energies);
-                                // VinaMetal: optional diagnostic breakdown
+                                // VinaMetalic: optional diagnostic breakdown
                                 if (show_metal_breakdown) print_metal_breakdown(v);
                         } else if (local_only) {
                                 std::vector<double> energies;
                                 energies = v.optimize();
                                 v.write_pose(out_name);
                                 v.show_score(energies);
-                                // VinaMetal: optional diagnostic breakdown
+                                // VinaMetalic: optional diagnostic breakdown
                                 if (show_metal_breakdown) print_metal_breakdown(v);
                         } else {
                                 v.global_search(exhaustiveness, num_modes, min_rmsd, max_evals);
@@ -599,12 +599,12 @@ Thank you!\n";
                                         } else {
                                                 v.score(unbound_energy);
                                         }
-                                        // VinaMetal: optional diagnostic breakdown
+                                        // VinaMetalic: optional diagnostic breakdown
                                         if (show_metal_breakdown) print_metal_breakdown(v);
                                 } else if (local_only) {
                                         v.optimize();
                                         v.write_pose(out_name);
-                                        // VinaMetal: optional diagnostic breakdown
+                                        // VinaMetalic: optional diagnostic breakdown
                                         if (show_metal_breakdown) print_metal_breakdown(v);
                                 } else {
                                         v.global_search(exhaustiveness, num_modes, min_rmsd, max_evals);

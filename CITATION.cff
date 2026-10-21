@@ -1,11 +1,11 @@
 cff-version: 1.2.0
-message: "If you use VinaMetal, please cite it and the AutoDock Vina / AutoDock 4 foundations listed in the references."
-title: VinaMetal
+message: "If you use VinaMetalic, please cite it and the AutoDock Vina / AutoDock 4 foundations listed in the references."
+title: VinaMetalic
 type: software
 version: 1.0.1
 date-released: "2026-10-20"
 license: Apache-2.0
-repository-code: "https://github.com/cristhianyaranganana-arch/VinaMetal"
+repository-code: "https://github.com/cristhianyaranganana-arch/VinaMetalic"
 keywords:
   - molecular docking
   - metalloprotein
@@ -18,7 +18,7 @@ authors:
     orcid: "https://orcid.org/0009-0000-5539-0526"
     affiliation: "Universidad Norbert Wiener"
 abstract: >-
-  VinaMetal is a fork of AutoDock Vina 1.2.7 that integrates AutoDock 4 metal
+  VinaMetalic is a fork of AutoDock Vina 1.2.7 that integrates AutoDock 4 metal
   coordination physics into the native scoring function: metal-specific 12-6
   van der Waals terms, a differentiable coordination-number penalty and a
   bounded geometry bonus, all with analytic gradients. It also detects the

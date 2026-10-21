@@ -1,6 +1,6 @@
-# Contributing to VinaMetal
+# Contributing to VinaMetalic
 
-Thank you for your interest in improving VinaMetal. This document describes how
+Thank you for your interest in improving VinaMetalic. This document describes how
 to build the project, run the tests, and submit changes.
 
 ## Code of Conduct
@@ -12,10 +12,10 @@ attacks, harassment and discriminatory language are not.
 
 Open an issue and include:
 
-- VinaMetal version (`vina --version`) and commit hash.
+- VinaMetalic version (`vina --version`) and commit hash.
 - Operating system, compiler version, CMake version and Boost version.
 - The exact command line or configuration file used.
-- The complete log, including the `VinaMetal:` startup lines.
+- The complete log, including the `VinaMetalic:` startup lines.
 - Whether the problem also occurs with `--metals off`. If it does, it is likely
   inherited from AutoDock Vina 1.2.7.
 
@@ -44,7 +44,7 @@ All contributions must keep the following green:
 Additionally, changes that touch scoring, parsing or initialization must not
 break the no-metal regression:
 
-    tests/test_regression_no_metal.sh <path-to-vinametal>/vina <path-to-vina-1.2.7>
+    tests/test_regression_no_metal.sh <path-to-vinametalic>/vina <path-to-vina-1.2.7>
 
 The script compares `--local_only` output byte for byte. Run it whenever your
 change can affect the standard Vina terms.
