@@ -25,6 +25,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <cmath>
+#include <iostream>
 #include <fstream>
 
 metal_parameters::metal_parameters() {
@@ -134,17 +135,27 @@ sz metal_parameters::index_for_ad_type(sz ad_type) const {
     // Pick the entry matching ad_type, honoring the user-selected oxidation
     // state for elements with more than one entry (default: +2).
     sz best = ions.size();
+    int requested_state = 0;
     VINA_FOR(i, ions.size()) {
         const metal_ion& m = ions[i];
         if (m.ad_type != ad_type) continue;
         if (has_oxidation_choice(m.element)) {
             int state = get_oxidation_state(m.element);
             if (state == 0) state = 2; // default: +2
+            requested_state = state;
             if (m.formal_charge == state) return i;
         } else {
             return i;
         }
-        if (best == ions.size()) best = i; // fallback: first match
+        if (best == ions.size()) {
+            best = i; // fallback: first matching element
+            // Audit finding #7: never fall back silently -- the requested
+            // oxidation state has no calibrated entry; report the
+            // substitution so "Fe=4" on an Fe2+/Fe3+-only set is visible.
+            std::cerr << "VinaMetalic: WARNING no " << m.element << " parameters for oxidation state +"
+                      << requested_state << "; falling back to the +" << m.formal_charge
+                      << " entry (" << m.name << ").\n";
+        }
     }
     return best;
 }

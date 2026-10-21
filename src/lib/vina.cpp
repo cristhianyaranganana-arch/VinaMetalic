@@ -277,21 +277,44 @@ void Vina::set_metal_params(const std::string& path) {
 }
 
 void Vina::set_metal_oxidation(const std::string& spec) {
-        // Format: "Fe=3" or comma-separated "Fe=3,Cu=1"
-        std::vector<std::string> parts;
-        boost::split(parts, spec, boost::is_any_of(","));
-        VINA_FOR_IN(i, parts) {
-                std::string p = boost::trim_copy(parts[i]);
-                if (p.empty()) continue;
-                std::vector<std::string> kv;
-                boost::split(kv, p, boost::is_any_of("="));
-                if (kv.size() != 2) {
-                        std::cerr << "ERROR: --metal_oxidation expects 'Element=charge' pairs (e.g. Fe=3), got '" << p << "'\n";
-                        exit(EXIT_FAILURE);
-                }
-                m_metal_parameters.set_oxidation_state(boost::trim_copy(kv[0]), std::atoi(kv[1].c_str()));
-        }
-        m_metal_scoring_attached = false;
+	// Format: "Fe=3" or comma-separated "Fe=3,Cu=1"
+	std::vector<std::string> parts;
+	boost::split(parts, spec, boost::is_any_of(","));
+	VINA_FOR_IN(i, parts) {
+		std::string p = boost::trim_copy(parts[i]);
+		if (p.empty()) continue;
+		std::vector<std::string> kv;
+		boost::split(kv, p, boost::is_any_of("="));
+		if (kv.size() != 2) {
+			std::cerr << "ERROR: --metal_oxidation expects 'Element=charge' pairs (e.g. Fe=3), got '" << p << "'\n";
+			exit(EXIT_FAILURE);
+		}
+		// Audit finding #6: parse the charge strictly -- std::atoi silently
+		// returned 0 for non-numeric input ("Fe=abc"), which index_for_ad_type
+		// then interpreted as the default +2 state.
+		const std::string element = boost::trim_copy(kv[0]);
+		const std::string value = boost::trim_copy(kv[1]);
+		int charge = 0;
+		bool valid = !value.empty();
+		if (valid) {
+			try {
+				size_t consumed = 0;
+				charge = std::stoi(value, &consumed);
+				if (consumed != value.size()) valid = false; // e.g. "3abc"
+			} catch (const std::exception&) {
+				valid = false; // not an integer
+			}
+		}
+		if (valid && (charge < -4 || charge > 8)) valid = false; // implausible state
+		if (!valid) {
+			std::cerr << "ERROR: --metal_oxidation: charge for '" << element
+			          << "' must be an integer between -4 and 8 (e.g. Fe=3), got '"
+			          << value << "'\n";
+			exit(EXIT_FAILURE);
+		}
+		m_metal_parameters.set_oxidation_state(element, charge);
+	}
+	m_metal_scoring_attached = false;
 }
 
 void Vina::set_metals_enabled(bool enabled) {
