@@ -507,10 +507,15 @@ void cache::populate(const model &m, const precalculate &p, const szv &atom_type
                                                 VINA_FOR_IN(j, needed) {
                                                         const sz t2 = needed[j];
                                                         assert(t2 < nat);
-                                                        // VinaMetalic: metal ions must not contribute to the donor-type
-                                                        // maps; their interaction is added directly in eval/eval_deriv
-                                                        // (replaced by the metal-specific potential) to avoid double counting.
-                                                        if (m_metal_scoring && m_metal_scoring->enabled() && a.el == EL_TYPE_Met
+                                                        // VinaMetalic: only PARAMETRIZED metal ions (Zn2+/Mn2+/Mg2+/Ca2+/
+                                                        // Fe/Cu2+/Ni2+) must not contribute to the donor-type maps; their
+                                                        // interaction is added directly in eval/eval_deriv (replaced by the
+                                                        // metal-specific potential) to avoid double counting. Unparametrized
+                                                        // metals (Na, K, Co, Hg, Cd...) keep the standard Vina interaction in
+                                                        // this path, keeping it byte-identical to upstream Vina 1.2.7
+                                                        // (audit finding #1: the old a.el == EL_TYPE_Met test zeroed their
+                                                        // donor-map contribution and broke that equivalence).
+                                                        if (m_metal_scoring && m_metal_scoring->enabled() && m_metal_scoring->is_metal_ion(a)
                                                             && metal_scoring::is_coordination_donor_type(t2))
                                                                 continue;
                                                         const sz type_pair_index = triangular_matrix_index_permissive(nat, t1, t2);
