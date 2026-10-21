@@ -70,26 +70,6 @@ jobs:
           path: dist/*
           if-no-files-found: error
 
-  build-macos:
-    name: macOS-arm64
-    runs-on: macos-14
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Boost
-        run: brew install boost
-
-      # Homebrew ships shared-only Boost; the portability default
-      # (USE_STATIC_BOOST=ON) is disabled for this platform build.
-      - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DUSE_STATIC_BOOST=OFF
-
-      - name: Build
-        run: cmake --build build --parallel
-
-      - name: Test
-        run: ctest --test-dir build --output-on-failure
-
   release:
     name: Publish release
     needs: build-linux
