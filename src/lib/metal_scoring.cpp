@@ -13,6 +13,7 @@
 #include <cmath>
 #include <algorithm>
 #include <ostream>
+#include <iostream>
 
 const fl metal_vdw_cutoff = 8.0;    // Angstrom; matches Vina pair cutoff
 const fl metal_pair_cap   = 100000; // AD4-style cap (potentials.h ad4_vdw)
@@ -161,7 +162,7 @@ fl metal_scoring::eval(const model& m, vecv* forces) const {
         // coordination sphere. Only the remaining sites are available to the
         // ligand, so the CN target is reduced accordingly (computed once in
         // build_cache; the receptor geometry is fixed).
-        const fl cn_target = m_cache.target_cn[k];
+        const fl cn_target = m_cn_strict ? fl(ion.ideal_cn) : fl(m_cache.target_cn[k]); // strict: penalize against the full ideal CN (audit finding #2)
         fl cn_dev = cn - cn_target;
         e_total += m_w_cn * sqr(cn_dev);
         if (forces) {
@@ -228,7 +229,6 @@ fl metal_scoring::eval(const model& m, vecv* forces) const {
                         // d(cos)/d(u) = v/(ru*rv) - cos * u/ru^2
                         vec dcos_du; dcos_du = (1.0 / (ru * rv)) * v - (cos_theta / (ru * ru)) * u;
                         vec dcos_dv; dcos_dv = (1.0 / (ru * rv)) * u - (cos_theta / (rv * rv)) * v;
-                        const fl dE_dcos = m_w_geom * ion.geom_bonus_max * s_i * s_j * df_dcos; // d(-bonus)/d(cos)
                         // chain rule through the sigmoid distance weights:
                         // d s_i / d r_i < 0, d r_i / d coords_i = u/ru
                         const fl ds_i_dr = cn_sigmoid_derivative(shell_r[s1], r_mid, s_i);
@@ -286,6 +286,24 @@ void metal_scoring::build_cache(const model& m) const {
             vec diff; diff = donor.coords - a.coords;
             if (sqr(diff) < sqr(ion.cn_cutoff)) ++occupied;
         }
+        // Robustness guard (audit finding #10 / LIMITATIONS #4): the count
+        // above relies on Vina's donor typing. Re-count every N/O/S receptor
+        // atom within the cutoff regardless of typing and warn when the typed
+        // count is smaller than the element-based count, which may indicate an
+        // under-detected occupancy (e.g. a mis-typed His/Cys/Asp/Glu).
+        int any_nos = 0;
+        VINA_FOR(j, m.grid_atoms.size()) {
+            if (j == i) continue;
+            const atom& neighbor = m.grid_atoms[j];
+            if (neighbor.el != EL_TYPE_N && neighbor.el != EL_TYPE_O && neighbor.el != EL_TYPE_S) continue;
+            vec nos_diff; nos_diff = neighbor.coords - a.coords;
+            if (sqr(nos_diff) < sqr(ion.cn_cutoff)) ++any_nos;
+        }
+        if (any_nos > occupied)
+            std::cerr << "VinaMetalic: WARNING " << ion.name << " occupancy is " << occupied
+                      << " typed donor(s), but " << any_nos
+                      << " N/O/S receptor atom(s) lie within the " << ion.cn_cutoff
+                      << " A cutoff; review receptor donor typing before trusting the CN target.\n";
         int target = ion.ideal_cn - occupied;
         if (target < 0) target = 0;
         m_cache.occupied_cn.push_back(occupied);
@@ -305,7 +323,8 @@ void metal_scoring::report_cn_targets(std::ostream& out) const {
         const metal_ion& ion = m_params->ion(m_cache.metal_ions[k]);
         out << "VinaMetalic: " << ion.name << " CN target = ideal " << ion.ideal_cn
             << " - receptor-bound " << m_cache.occupied_cn[k]
-            << " = " << m_cache.target_cn[k] << "\n";
+            << " = " << m_cache.target_cn[k]
+            << (m_cn_strict ? " [strict: penalizing against ideal CN]" : "") << "\n";
     }
 }
 

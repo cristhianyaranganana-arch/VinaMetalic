@@ -283,7 +283,7 @@ Thank you!\n";
                         ("weight_metal_vdw", value<double>(&weight_metal_vdw)->default_value(weight_metal_vdw), "metal vdW weight (VinaMetalic)")
                         ("weight_metal_cn", value<double>(&weight_metal_cn)->default_value(weight_metal_cn), "coordination-number penalty weight (VinaMetalic)")
                         ("weight_metal_geom", value<double>(&weight_metal_geom)->default_value(weight_metal_geom), "coordination geometry bonus weight (VinaMetalic)")
-                        ("metal_cn_strict", bool_switch(&metal_cn_strict)->default_value(false), "treat any coordination number deviation as penalized even for incomplete shells (VinaMetalic)")
+                        ("metal_cn_strict", bool_switch(&metal_cn_strict)->default_value(false), "penalize the CN deviation against the full ideal coordination number instead of the receptor-occupancy-reduced target (VinaMetalic)")
                         ("metal_breakdown", bool_switch(&show_metal_breakdown), "print the VinaMetalic energy breakdown (metal vdW / CN penalty / geometry bonus / donor-metal contacts) after --score_only or --local_only scoring (VinaMetalic)")
                 ;
                 options_description misc("Misc (optional)");
